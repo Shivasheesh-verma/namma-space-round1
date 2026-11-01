@@ -197,10 +197,7 @@ async function boot() {
   spark = new SparkRenderer({ renderer, sortRadial: true });
   scene.add(spark);
   say("Downloading the room (about 210 MB)…");
-  const plyUrl = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
-    ? "mushroom/scene.ply"
-    : "https://github.com/Shivasheesh-verma/namma-space-round1/releases/download/round1/scene.ply";
-  const response = await fetch(plyUrl);
+  const response = await fetch("mushroom/scene.ply");
   if (!response.ok) throw new Error(`scene.ply: HTTP ${response.status}`);
   const fileBytes = new Uint8Array(await response.arrayBuffer());
   say("Decoding the splat…");

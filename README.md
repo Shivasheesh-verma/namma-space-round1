@@ -11,7 +11,7 @@ Click the picture, then WASD. Shift is faster. R returns to the start. Walls and
 | Path | Contents |
 | --- | --- |
 | `index.html` | The viewer |
-| `mushroom/` | Floor, door, furniture plan. The 220 MB splat is the release file `scene.ply`, not in git |
+| `mushroom/` | Floor, door, furniture plan, and the splat the viewer loads |
 | `docs/Technical-Abstract.pdf` | Architecture, pipeline, and the capture procedure (2 pages) |
 | `docs/Proof-of-Concept.pdf` | The viewer link |
 | `RECONSTRUCT.md` | How the model was trained |
@@ -20,16 +20,13 @@ Click the picture, then WASD. Shift is faster. R returns to the start. Walls and
 
 ## Run it on this machine
 
-The splat is not in git because it is 220 MB. Download it once:
-
 ```
-mkdir -p mushroom
-curl -L -o mushroom/scene.ply \
-  https://github.com/Shivasheesh-verma/namma-space-round1/releases/download/round1/scene.ply
 python3 -m http.server 8766
 ```
 
 Open http://127.0.0.1:8766/
+
+The file `mushroom/scene.ply` is the same 888,760 points with the base colour, small enough for GitHub Pages. The full view-dependent splat, 220 MB, is the `round1` release.
 
 ## Credit
 
