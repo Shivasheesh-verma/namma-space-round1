@@ -222,7 +222,7 @@ async function boot() {
   await splat.initialized;
   scene.add(splat);
   ready = true;
-  say("Click the picture, then walk with WASD. Walls and the closed door stop you. Empty floor does not. Shift is faster. R resets. MuSHRoom classroom, CC BY 4.0.");
+  say("Click the picture, then walk with WASD. Walls and the closed door stop you. Furniture does not. Shift is faster. R resets. MuSHRoom classroom, CC BY 4.0.");
   renderer.setAnimationLoop(frame);
 }
 
