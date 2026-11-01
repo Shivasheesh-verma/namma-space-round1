@@ -26,6 +26,7 @@ let frames = 0, fpsStamp = performance.now(), fps = 0;
 
 function say(text) {
   status.textContent = text;
+  if (metrics) metrics.textContent = text;
   status.style.display = text.startsWith("Click the picture") ? "none" : "block";
 }
 
@@ -196,11 +197,27 @@ async function boot() {
   drawPlan();
   spark = new SparkRenderer({ renderer, sortRadial: true });
   scene.add(spark);
-  say("Downloading the room (about 210 MB)…");
+  say("Downloading the room…");
   const response = await fetch("mushroom/scene.ply");
   if (!response.ok) throw new Error(`scene.ply: HTTP ${response.status}`);
-  const fileBytes = new Uint8Array(await response.arrayBuffer());
-  say("Decoding the splat…");
+  const total = Number(response.headers.get("content-length")) || 0;
+  const reader = response.body.getReader();
+  const chunks = [];
+  let got = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    got += value.byteLength;
+    const mb = (got / 1e6).toFixed(0);
+    metrics.textContent = total
+      ? `Downloading the room, ${mb} of ${(total / 1e6).toFixed(0)} MB`
+      : `Downloading the room, ${mb} MB`;
+  }
+  const fileBytes = new Uint8Array(got);
+  let off = 0;
+  for (const chunk of chunks) { fileBytes.set(chunk, off); off += chunk.byteLength; }
+  say("Drawing the room…");
   splat = new SplatMesh({ fileBytes, fileName: "scene.ply", lod: false, raycastable: false });
   await splat.initialized;
   scene.add(splat);
@@ -209,4 +226,4 @@ async function boot() {
   renderer.setAnimationLoop(frame);
 }
 
-boot().catch((e) => { say(e.message); console.error(e); });
+boot().catch((e) => { say(e.message || String(e)); console.error(e); });

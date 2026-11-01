@@ -14,7 +14,7 @@ Click the picture, then WASD. Shift is faster. R returns to the start. Walls and
 | `mushroom/` | Floor, door, furniture plan, and the splat the viewer loads |
 | `docs/Technical-Abstract.pdf` | Architecture, pipeline, and the capture procedure (2 pages) |
 | `docs/Proof-of-Concept.pdf` | The viewer link |
-| `docs/Demonstration.mp4` | 3 min 57 s: scope, capture, and the walk |
+| [docs/Demonstration.mp4](docs/Demonstration.mp4) | The video. Open that link and press play. 3 min 57 s |
 | `RECONSTRUCT.md` | How the model was trained |
 | `pipeline/mushroom_classroom_1m.json` | The train config |
 | `test/sample/` | Eight frames of the capture: photo, depth, pose |
@@ -27,7 +27,7 @@ python3 -m http.server 8766
 
 Open http://127.0.0.1:8766/
 
-The file `mushroom/scene.ply` is the same 888,760 points with the base colour, small enough for GitHub Pages. The full view-dependent splat, 220 MB, is the `round1` release.
+`mushroom/scene.ply` is the trained classroom, thinned to 333,910 points so the page can host it and finish loading. The full 888,760-point file is the [round1 release](https://github.com/Shivasheesh-verma/namma-space-round1/releases/tag/round1).
 
 ## Credit
 
