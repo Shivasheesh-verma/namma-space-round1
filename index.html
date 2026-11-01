@@ -8,8 +8,9 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "https://esm.sh/three@0.180.0",
-      "@sparkjsdev/spark": "https://esm.sh/@sparkjsdev/spark@2.3.1"
+      "three": "./vendor/three.module.js",
+      "three/addons/postprocessing/Pass.js": "./vendor/Pass.js",
+      "@sparkjsdev/spark": "./vendor/spark.module.js"
     }
   }
   </script>
@@ -58,6 +59,17 @@
   </figure>
   <p id="help"><b>WASD</b> move <b>SHIFT</b> faster <b>CLICK</b> look <b>R</b> reset</p>
   <p id="status" role="status">Loading…</p>
+  <script>
+    window.addEventListener("error", (e) => {
+      const m = document.querySelector("#metrics");
+      if (m) m.textContent = e.message || "The viewer failed to start.";
+    });
+    window.addEventListener("unhandledrejection", (e) => {
+      const m = document.querySelector("#metrics");
+      const reason = e.reason && (e.reason.message || String(e.reason));
+      if (m) m.textContent = reason || "The viewer failed to start.";
+    });
+  </script>
   <script type="module" src="src/mushroom.js"></script>
 </body>
 </html>
