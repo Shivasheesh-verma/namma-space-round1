@@ -1,6 +1,6 @@
 # Room files
 
-Shivasheesh Verma, Sarvagya, and Vidhi.
+Shivasheesh Verma, Class 11, Gulmohar High School. Sarvagya Kaushik, Class 11, Gulmohar High School. Vidhi Arora, Class 11, Springdale Senior School.
 
 The viewer reads these files. The public picture is the same 220 MB file, served from https://namma-space-viewer.vercel.app/
 

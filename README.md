@@ -1,16 +1,21 @@
 # Namma Space, Round 1
 
-Shivasheesh Verma, Sarvagya, and Vidhi.
+- Shivasheesh Verma, Class 11, Gulmohar High School
+- Sarvagya Kaushik, Class 11, Gulmohar High School
+- Vidhi Arora, Class 11, Springdale Senior School
+
+## Submission
+
+| Document | Link |
+| --- | --- |
+| Technical abstract | [docs/Technical-Abstract.pdf](docs/Technical-Abstract.pdf) |
+| Proof of concept | [docs/Proof-of-Concept.pdf](docs/Proof-of-Concept.pdf) |
+| Demonstration video, 3 min 59 s | [docs/Demonstration.mp4](docs/Demonstration.mp4) |
+| Viewer | https://namma-space-viewer.vercel.app/ |
+
+The viewer stays online. It does not need a computer at the school to be awake. The first open downloads about 220 MB, then the room appears. Click the picture, then WASD. The mouse looks. Shift is faster. R returns to the start. Walls and the closed door stop you. Furniture does not.
 
 A walkable classroom. The picture is a Gaussian splat trained from an iPhone LiDAR capture. The plan is the measured floor, 8.95 m by 7.43 m, with the furniture from the LiDAR, a 2 m scale bar, the closed door, and you.
-
-The viewer stays online. It does not need this computer to be awake.
-
-- **Viewer:** https://namma-space-viewer.vercel.app/
-- **Video, 3 min 59 s:** [docs/Demonstration.mp4](docs/Demonstration.mp4). This file plays on its own.
-- **Code:** https://github.com/Shivasheesh-verma/namma-space-round1
-
-Click the picture, then WASD. The mouse looks. Shift is faster. R returns to the start. Walls and the closed door stop you. Furniture does not. The top left counts the download, then shows the frame rate.
 
 ## What is where
 

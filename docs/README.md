@@ -1,6 +1,6 @@
 # Documents
 
-Shivasheesh Verma, Sarvagya, and Vidhi.
+Shivasheesh Verma, Class 11, Gulmohar High School. Sarvagya Kaushik, Class 11, Gulmohar High School. Vidhi Arora, Class 11, Springdale Senior School.
 
 The viewer stays online at https://namma-space-viewer.vercel.app/ and does not need this computer to be awake. The video is a file.
 

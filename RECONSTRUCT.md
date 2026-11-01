@@ -1,6 +1,6 @@
 # Reconstruct
 
-Shivasheesh Verma, Sarvagya, and Vidhi.
+Shivasheesh Verma, Class 11, Gulmohar High School. Sarvagya Kaushik, Class 11, Gulmohar High School. Vidhi Arora, Class 11, Springdale Senior School.
 
 One view is a colour photo, a depth image, the lens numbers, and a 4×4 pose. `test/sample/` holds eight frames in that shape. The full capture is the MuSHRoom classroom long capture, 797 frames.
 
