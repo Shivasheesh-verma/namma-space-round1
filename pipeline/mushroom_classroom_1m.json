@@ -1,0 +1,57 @@
+{
+  "name": "MUSHROOM_classroom_1m",
+  "label": "MuSHRoom classroom iPhone long capture, CC BY 4.0. 550 sharpest frames, people frames dropped. Y-up take. Cap 1e6 so the splat can sit in a browser. Depth seed from the take. One Round 1 train.",
+  "input": {
+    "adapter": "normalized",
+    "session": "builds/mushroom/session_classroom",
+    "validate": true
+  },
+  "data": {
+    "width": 738,
+    "height": 994,
+    "rgb_time_offset_frames": 0.0,
+    "split_rule": "mod20",
+    "all_frames": false
+  },
+  "seed": {
+    "path": "experiments/m4-reconstruction/outputs/seeds/mushroom-classroom-sharp550-4cm.ply",
+    "build": {
+      "ids": "train",
+      "voxel": 0.04,
+      "trunc": 6.0,
+      "near": 0.15,
+      "edge_filter": true,
+      "min_conf": 0
+    }
+  },
+  "train": {
+    "steps": 30000,
+    "depth_weight": 0.05,
+    "depth_scale": 0.05,
+    "depth_res": "full",
+    "depth_confidence": "absent",
+    "depth_near": 0.15,
+    "depth_far": 6.0,
+    "pose_mode": "off",
+    "blur_aware": false,
+    "cap": 1000000,
+    "stop_split_at": 15000,
+    "grow_grad2d": 0.0008,
+    "refine_start": 500,
+    "reset_every_steps": 3000,
+    "pause_refine": 0,
+    "prune_opa": 0.005,
+    "seed": 42,
+    "checkpoint_every": 5000,
+    "loader_threads": 4
+  },
+  "eval": {
+    "ids": "heldout",
+    "protocols": ["raw@0.0"],
+    "lpips": false
+  },
+  "export": {
+    "lidar_cloud": null,
+    "spz_converter": null
+  }
+}
