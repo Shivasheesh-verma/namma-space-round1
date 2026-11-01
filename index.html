@@ -3,41 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Namma Space · Classroom</title>
-  <link rel="icon" href="data:,">
+  <title>Namma Space · MuSHRoom classroom</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Space+Grotesk:wght@600;700&display=swap">
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "./vendor/three.module.js",
-      "three/addons/postprocessing/Pass.js": "./vendor/Pass.js",
-      "@sparkjsdev/spark": "./vendor/spark.module.js"
-    }
-  }
-  </script>
-  <style>
-    html, body { margin: 0; height: 100%; overflow: hidden; background: #111; }
-    #stage { position: fixed; inset: 0; }
-    #stage canvas { width: 100%; height: 100%; display: block; }
-    body { font-family: "IBM Plex Mono", ui-monospace, monospace; }
-    #hud { position: fixed; z-index: 5; top: 16px; left: 18px; width: min(420px, calc(100vw - 36px)); padding: 12px 14px 14px; color: #111; background: #f3f0e8; border: 3px solid #111; box-shadow: 8px 8px 0 #111; }
-    #hud .eyebrow { font-size: 10px; letter-spacing: .12em; font-weight: 700; color: #ff4d32; margin: 0 0 6px; }
-    #title { margin: 0; font: 700 42px/0.9 "Space Grotesk", sans-serif; letter-spacing: -.06em; }
-    #subtitle, #metrics { margin: 10px 0 0; font-size: 12px; line-height: 1.4; }
-    #status-stamp { position: fixed; z-index: 12; right: 18px; top: 18px; padding: 8px 10px; background: #d7ff3f; color: #111; border: 3px solid #111; box-shadow: 6px 6px 0 #ff4d32; }
-    #status-stamp span { display: block; font-size: 9px; letter-spacing: .08em; font-weight: 700; }
-    #status-stamp b { font: 700 22px/1 "Space Grotesk", sans-serif; }
-    #map-wrap { position: fixed; z-index: 10; right: 18px; top: 92px; margin: 0; width: 360px; background: #f3f0e8; border: 3px solid #111; box-shadow: 8px 8px 0 #111; color: #111; }
-    .panel-label { font-size: 10px; letter-spacing: .12em; font-weight: 700; color: #ff4d32; padding: 8px 10px; border-bottom: 3px solid #111; }
-    #plan { width: 360px; height: 300px; display: block; background: #f3f0e8; }
-    #map-legend { display: flex; gap: 10px; flex-wrap: wrap; padding: 8px 10px; font-size: 10px; font-weight: 600; border-top: 3px solid #111; }
-    #map-legend span { display: inline-flex; align-items: center; }
-    #map-legend i { width: 10px; height: 10px; border: 1px solid #111; margin-right: 4px; }
-    .sw-floor { background: #c9c8bc; } .sw-furn { background: #ff4d32; } .sw-door { background: #d7ff3f; } .sw-you { background: #111; }
-    #help { position: fixed; z-index: 10; left: 18px; bottom: 18px; padding: 10px 12px; background: #f3f0e8; color: #111; border: 3px solid #111; box-shadow: 6px 6px 0 #ff4d32; font-size: 12px; font-weight: 600; }
-    #help b { background: #111; color: #d7ff3f; padding: 2px 4px; margin-right: 4px; }
-    #status { position: fixed; z-index: 10; left: 18px; bottom: 72px; max-width: 640px; margin: 0; padding: 10px 12px; background: #f3f0e8; color: #111; border: 3px solid #111; font-size: 12px; }
-  </style>
+  <script type="module" crossorigin src="./assets/mushroom-9hHXlSjV.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/mushroom-CDYyEeqc.css">
 </head>
 <body>
   <main id="stage"></main>
@@ -60,17 +29,28 @@
   </figure>
   <p id="help"><b>WASD</b> move <b>SHIFT</b> faster <b>CLICK</b> look <b>R</b> reset</p>
   <p id="status" role="status">Loading…</p>
-  <script>
-    window.addEventListener("error", (e) => {
-      const m = document.querySelector("#metrics");
-      if (m) m.textContent = e.message || "The viewer failed to start.";
-    });
-    window.addEventListener("unhandledrejection", (e) => {
-      const m = document.querySelector("#metrics");
-      const reason = e.reason && (e.reason.message || String(e.reason));
-      if (m) m.textContent = reason || "The viewer failed to start.";
-    });
-  </script>
-  <script type="module" src="src/mushroom.js"></script>
+  <style>
+    body{font-family:'IBM Plex Mono',ui-monospace,monospace;background:#111}
+    #hud{left:18px;right:auto;width:min(420px,calc(100vw - 36px));padding:12px 14px 14px;color:#111;background:#f3f0e8;border:3px solid #111;box-shadow:8px 8px 0 #111}
+    #hud .eyebrow{font-size:10px;letter-spacing:.12em;font-weight:700;color:#ff4d32;margin:0 0 6px}
+    #title{margin:0;font:700 42px/0.9 'Space Grotesk',sans-serif;letter-spacing:-.06em}
+    #subtitle{margin:10px 0 0;font-size:12px;line-height:1.4;max-width:36ch}
+    #metrics{margin:8px 0 0;font-size:11px}
+    #status-stamp{position:fixed;z-index:12;right:18px;top:18px;padding:8px 10px;background:#d7ff3f;color:#111;border:3px solid #111;box-shadow:6px 6px 0 #ff4d32}
+    #status-stamp span{display:block;font-size:9px;letter-spacing:.08em;font-weight:700}
+    #status-stamp b{font:700 22px/1 'Space Grotesk',sans-serif}
+    #map-wrap{position:fixed;z-index:10;right:18px;top:92px;margin:0;width:360px;background:#f3f0e8;border:3px solid #111;box-shadow:8px 8px 0 #111;color:#111}
+    .panel-label{font-size:10px;letter-spacing:.12em;font-weight:700;color:#ff4d32;padding:8px 10px;border-bottom:3px solid #111}
+    #plan{width:360px !important;height:300px !important;display:block;background:#f3f0e8}
+    #map-legend{display:flex;gap:10px;flex-wrap:wrap;padding:8px 10px;font-size:10px;font-weight:600;border-top:3px solid #111}
+    #map-legend span{display:inline-flex;align-items:center}
+    #map-legend i{width:10px;height:10px;border:1px solid #111;margin-right:4px}
+    .sw-floor{background:#c9c8bc}.sw-furn{background:#ff4d32}.sw-door{background:#d7ff3f}.sw-you{background:#111}
+    #help{left:18px;bottom:18px;max-width:none;padding:10px 12px;background:#f3f0e8;color:#111;border:3px solid #111;box-shadow:6px 6px 0 #ff4d32;font-size:12px;font-weight:600}
+    #help b{background:#111;color:#d7ff3f;padding:2px 4px;margin-right:4px}
+    #status{background:#f3f0e8;color:#111;border:3px solid #111;max-width:640px;bottom:72px}
+    aside{display:none}
+  #stage canvas{width:100vw !important;height:100vh !important}
+  </style>
 </body>
 </html>
