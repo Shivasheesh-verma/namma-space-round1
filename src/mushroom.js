@@ -42,7 +42,7 @@ function look() {
 
 function reset() {
   camera.position.set(spawn.x, collider.floorY + collider.data.eye_height, spawn.z);
-  yaw = 0.4;
+  yaw = 0;
   pitch = -0.08;
   look();
 }
@@ -198,7 +198,7 @@ async function boot() {
   spark = new SparkRenderer({ renderer, sortRadial: true });
   scene.add(spark);
   say("Downloading the room…");
-  const response = await fetch("mushroom/scene.ply");
+  const response = await fetch("https://zitm8zj1k0rea8km.public.blob.vercel-storage.com/scene.ply");
   if (!response.ok) throw new Error(`scene.ply: HTTP ${response.status}`);
   const total = Number(response.headers.get("content-length")) || 0;
   const reader = response.body.getReader();

@@ -1,10 +1,12 @@
 # Room files
 
-The viewer reads these five files.
+Shivasheesh Verma, Sarvagya, and Vidhi.
+
+The viewer reads these files. The public picture is the same 220 MB file, served from https://namma-space-viewer.vercel.app/
 
 | File | What it is |
 | --- | --- |
-| `scene.ply` | The picture. 333,910 Gaussian splat points, 83 MB, a subset of the 888,760-point trained file. The full file is on the `round1` release. |
+| `scene.ply` | A smaller copy kept in the repository, about 83 MB. The viewer loads the full 220 MB file. |
 | `collision.json` | The floor polygon, the walls, and the closed door. These stop the walk. |
 | `plan.json` | The furniture on the plan, from the LiDAR, in 10 cm cells. Drawn only. It does not stop the walk. |
 | `spawn.json` | Where the walk starts. |
