@@ -14,6 +14,7 @@ Click the picture, then WASD. Shift is faster. R returns to the start. Walls and
 | `mushroom/` | Floor, door, furniture plan, and the splat the viewer loads |
 | `docs/Technical-Abstract.pdf` | Architecture, pipeline, and the capture procedure (2 pages) |
 | `docs/Proof-of-Concept.pdf` | The viewer link |
+| `docs/Demonstration.mp4` | 3 min 43 s: scope, capture, and the walk |
 | `RECONSTRUCT.md` | How the model was trained |
 | `pipeline/mushroom_classroom_1m.json` | The train config |
 | `test/sample/` | Eight frames of the capture: photo, depth, pose |
