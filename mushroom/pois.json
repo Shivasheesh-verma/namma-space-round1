@@ -1,0 +1,10 @@
+{
+  "places": [
+    {"id": "door", "name": "Closed door", "words": ["door", "exit", "entrance"], "x": -6.72, "z": -2.49},
+    {"id": "back", "name": "Back of the aisle", "words": ["back", "aisle", "start", "rear"], "x": -4.87, "z": 2.75},
+    {"id": "left", "name": "Left desk row", "words": ["left", "left desks", "left row"], "x": -4.90, "z": 1.20},
+    {"id": "centre", "name": "Centre desk row", "words": ["centre", "center", "middle", "centre desks", "middle desks"], "x": -4.90, "z": 0.20},
+    {"id": "right", "name": "Right desk row", "words": ["right", "right desks", "right row"], "x": -1.44, "z": -1.08},
+    {"id": "front", "name": "Front of the room", "words": ["front", "windows", "window", "board"], "x": -3.69, "z": -3.58}
+  ]
+}

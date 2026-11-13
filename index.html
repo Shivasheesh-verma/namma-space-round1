@@ -5,15 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Namma Space · MuSHRoom classroom</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Space+Grotesk:wght@600;700&display=swap">
-  <script type="module" crossorigin src="./assets/mushroom-9hHXlSjV.js?v=back"></script>
-  <link rel="stylesheet" crossorigin href="./assets/mushroom-CDYyEeqc.css">
+  <script type="module" crossorigin src="./assets/index-iib5nNCq.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CDYyEeqc.css">
 </head>
 <body>
   <main id="stage"></main>
   <header id="hud">
     <p class="eyebrow">NAMMA SPACE / CLASSROOM</p>
     <h1 id="title">Walk the room</h1>
-    <p id="subtitle">The picture is the scan. The plan is the measured floor, 8.95 m by 7.43 m.</p>
+    <p id="subtitle">The picture is the scan. Search a place and follow the path around the desks.</p>
+    <form id="find" autocomplete="off">
+      <label for="q">SEARCH</label>
+      <input id="q" placeholder="door, desks, front, back">
+      <ol id="hits"></ol>
+    </form>
     <p id="metrics">Loading…</p>
   </header>
   <div id="status-stamp"><span>FROM START</span><b id="distance">0.0 m</b></div>
@@ -25,9 +30,10 @@
       <span><i class="sw-furn"></i>furniture</span>
       <span><i class="sw-door"></i>door</span>
       <span><i class="sw-you"></i>you</span>
+      <span><i class="sw-path"></i>path</span>
     </div>
   </figure>
-  <p id="help"><b>WASD</b> move <b>SHIFT</b> faster <b>CLICK</b> look <b>R</b> reset</p>
+  <p id="help"><b>SEARCH</b> a place <b>WASD</b> move <b>SHIFT</b> faster <b>CLICK</b> look <b>R</b> reset</p>
   <p id="status" role="status">Loading…</p>
   <style>
     body{font-family:'IBM Plex Mono',ui-monospace,monospace;background:#111}
@@ -36,6 +42,11 @@
     #title{margin:0;font:700 42px/0.9 'Space Grotesk',sans-serif;letter-spacing:-.06em}
     #subtitle{margin:10px 0 0;font-size:12px;line-height:1.4;max-width:36ch}
     #metrics{margin:8px 0 0;font-size:11px}
+    #find{margin:12px 0 0}
+    #find label{display:block;font-size:10px;letter-spacing:.12em;font-weight:700;color:#ff4d32;margin-bottom:4px}
+    #q{width:100%;box-sizing:border-box;border:3px solid #111;background:#fff;color:#111;font:600 14px 'IBM Plex Mono',monospace;padding:8px}
+    #hits{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+    #hits button{border:2px solid #111;background:#d7ff3f;color:#111;font:600 11px 'IBM Plex Mono',monospace;padding:4px 6px;cursor:pointer}
     #status-stamp{position:fixed;z-index:12;right:18px;top:18px;padding:8px 10px;background:#d7ff3f;color:#111;border:3px solid #111;box-shadow:6px 6px 0 #ff4d32}
     #status-stamp span{display:block;font-size:9px;letter-spacing:.08em;font-weight:700}
     #status-stamp b{font:700 22px/1 'Space Grotesk',sans-serif}
@@ -45,7 +56,7 @@
     #map-legend{display:flex;gap:10px;flex-wrap:wrap;padding:8px 10px;font-size:10px;font-weight:600;border-top:3px solid #111}
     #map-legend span{display:inline-flex;align-items:center}
     #map-legend i{width:10px;height:10px;border:1px solid #111;margin-right:4px}
-    .sw-floor{background:#c9c8bc}.sw-furn{background:#ff4d32}.sw-door{background:#d7ff3f}.sw-you{background:#111}
+    .sw-floor{background:#c9c8bc}.sw-furn{background:#ff4d32}.sw-door{background:#d7ff3f}.sw-you{background:#111}.sw-path{background:#d7ff3f}
     #help{left:18px;bottom:18px;max-width:none;padding:10px 12px;background:#f3f0e8;color:#111;border:3px solid #111;box-shadow:6px 6px 0 #ff4d32;font-size:12px;font-weight:600}
     #help b{background:#111;color:#d7ff3f;padding:2px 4px;margin-right:4px}
     #status{background:#f3f0e8;color:#111;border:3px solid #111;max-width:640px;bottom:72px}

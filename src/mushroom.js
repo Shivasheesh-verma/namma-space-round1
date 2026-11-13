@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { SparkRenderer, SplatMesh } from "@sparkjsdev/spark";
 import { LayoutCollider } from "./collision.js";
+import { buildGrid, route } from "./path.js";
 
 const status = document.querySelector("#status");
 const metrics = document.querySelector("#metrics");
@@ -17,7 +18,10 @@ camera.rotation.order = "YXZ";
 
 const keys = new Set();
 let yaw = 0, pitch = 0, locked = false, ready = false;
-let collider, spawn, splat, spark, planData = null;
+let collider, spawn, splat, spark, planData = null, places = [], grid = null;
+let path = [], pathName = "", follow = null, pathMarks = null;
+const queryEl = document.querySelector("#q");
+const hitsEl = document.querySelector("#hits");
 const distanceEl = document.querySelector("#distance");
 const planCanvas = document.querySelector("#plan");
 const planCtx = planCanvas.getContext("2d");
@@ -114,6 +118,26 @@ function drawPlan() {
   ctx.textAlign = "left";
   ctx.textBaseline = "bottom";
   ctx.fillText("2 m", bx, by - 3);
+  if (path.length > 1) {
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    path.forEach((p, i) => (i ? ctx.lineTo(X(p.x), Y(p.z)) : ctx.moveTo(X(p.x), Y(p.z))));
+    ctx.stroke();
+    ctx.strokeStyle = "#d7ff3f";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.font = "700 10px 'IBM Plex Mono', monospace";
+  for (const place of places) {
+    ctx.fillStyle = place.name === pathName ? "#d7ff3f" : "#111";
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(X(place.x), Y(place.z), 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
   if (spawn && distanceEl) {
     const d = Math.hypot(px - spawn.x, pz - spawn.z);
     distanceEl.textContent = `${d.toFixed(1)} m`;
@@ -129,12 +153,26 @@ function frame() {
     if (keys.has("KeyA")) s -= 1;
     if (keys.has("KeyD")) s += 1;
     if (f || s) {
+      follow = null;
       const speed = (keys.has("ShiftLeft") || keys.has("ShiftRight") ? 2.2 : 1.35) * dt / Math.hypot(f, s);
       collider.move(
         camera.position,
         (s * Math.cos(yaw) - f * Math.sin(yaw)) * speed,
         (-s * Math.sin(yaw) - f * Math.cos(yaw)) * speed,
       );
+    } else if (follow) {
+      const next = follow.points[follow.i];
+      const dx = next.x - camera.position.x;
+      const dz = next.z - camera.position.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist < 0.18) {
+        follow.i += 1;
+        if (follow.i >= follow.points.length) follow = null;
+      } else {
+        yaw = Math.atan2(-dx, -dz);
+        const step = Math.min(1.15 * dt, dist);
+        collider.move(camera.position, dx / dist * step, dz / dist * step);
+      }
     }
     camera.position.y = collider.floorY + collider.data.eye_height;
     look();
@@ -161,7 +199,13 @@ window.addEventListener("keydown", (e) => {
     keys.add(e.code);
     e.preventDefault();
   }
-  if (e.code === "KeyR") reset();
+  if (e.code === "KeyR") {
+    follow = null; path = []; pathName = "";
+    if (pathMarks) scene.remove(pathMarks);
+    pathMarks = null;
+    reset();
+  }
+  if (e.code === "Enter" && document.activeElement === queryEl) e.preventDefault();
 });
 window.addEventListener("keyup", (e) => keys.delete(e.code));
 renderer.domElement.addEventListener("click", () => {
@@ -193,6 +237,11 @@ async function boot() {
   collider = new LayoutCollider(data);
   if (!collider.canOccupy(spawn.x, spawn.z)) throw new Error("Spawn is inside a wall");
   try { planData = await get("plan.json"); } catch { planData = null; }
+  collider.setFurniture(planData);
+  if (!collider.canOccupy(spawn.x, spawn.z)) throw new Error("Spawn is inside a desk or a wall");
+  try { places = (await get("pois.json")).places; } catch { places = []; }
+  grid = buildGrid(collider, 0.25);
+  wireSearch();
   reset();
   drawPlan();
   spark = new SparkRenderer({ renderer, sortRadial: true });
@@ -222,8 +271,73 @@ async function boot() {
   await splat.initialized;
   scene.add(splat);
   ready = true;
-  say("Click the picture, then walk with WASD. Walls and the closed door stop you. Furniture does not. Shift is faster. R resets. MuSHRoom classroom, CC BY 4.0.");
+  say("Search a place, then follow the path. Desks, walls, and the closed door stop you. WASD walks. Shift is faster. R resets.");
+  renderHits("");
   renderer.setAnimationLoop(frame);
+}
+
+function renderHits(text) {
+  if (!hitsEl) return;
+  const q = text.trim().toLowerCase();
+  const matched = places.filter((place) => {
+    if (!q) return true;
+    return place.name.toLowerCase().includes(q) || place.words.some((word) => word.includes(q) || q.includes(word));
+  });
+  hitsEl.replaceChildren();
+  for (const place of matched) {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = place.name;
+    button.addEventListener("click", () => choose(place));
+    item.appendChild(button);
+    hitsEl.appendChild(item);
+  }
+}
+
+function choose(place) {
+  const found = route(grid, camera.position, place);
+  path = found;
+  pathName = place.name;
+  if (!found.length) {
+    follow = null;
+    if (pathMarks) scene.remove(pathMarks);
+    pathMarks = null;
+    say(`No walkable path to ${place.name}.`);
+    return;
+  }
+  follow = { points: found, i: 0 };
+  showPath();
+  const metres = found.slice(1).reduce((sum, point, i) => sum + Math.hypot(point.x - found[i].x, point.z - found[i].z), 0);
+  say(`Path to ${place.name}, ${metres.toFixed(1)} m. It goes around the desks.`);
+  if (queryEl) queryEl.value = place.name;
+}
+
+function showPath() {
+  if (pathMarks) scene.remove(pathMarks);
+  pathMarks = new THREE.Group();
+  const y = collider.floorY + 0.05;
+  const material = new THREE.MeshBasicMaterial({ color: 0xd7ff3f });
+  for (const point of path) {
+    const mark = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.025, 0.14), material);
+    mark.position.set(point.x, y, point.z);
+    pathMarks.add(mark);
+  }
+  scene.add(pathMarks);
+}
+
+function wireSearch() {
+  if (!queryEl) return;
+  queryEl.addEventListener("input", () => renderHits(queryEl.value));
+  queryEl.addEventListener("keydown", (e) => {
+    if (e.code !== "Enter") return;
+    e.preventDefault();
+    const q = queryEl.value.trim().toLowerCase();
+    const place = places.find((item) => item.name.toLowerCase() === q)
+      || places.find((item) => item.words.some((word) => word === q || word.includes(q)));
+    if (place) choose(place);
+    else say("No place with that name.");
+  });
 }
 
 boot().catch((e) => { say(e.message || String(e)); console.error(e); });

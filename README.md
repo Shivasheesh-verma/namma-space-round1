@@ -13,7 +13,7 @@
 | Demonstration video, 3 min 59 s | [docs/Demonstration.mp4](docs/Demonstration.mp4) |
 | Viewer | https://namma-space-viewer.vercel.app/ |
 
-The viewer stays online. It does not need a computer at the school to be awake. The first open downloads about 220 MB, then the room appears. Click the picture, then WASD. The mouse looks. Shift is faster. R returns to the start. Walls and the closed door stop you. Furniture does not.
+The viewer stays online. It does not need a computer at the school to be awake. The first open downloads about 220 MB, then the room appears. Search for the door, a desk row, the front, or the back. A yellow path on the floor and on the plan goes around the desks, and the view follows it. WASD still walks. Shift is faster. R returns to the start. Desks, walls, and the closed door stop you.
 
 A walkable classroom. The picture is a Gaussian splat trained from an iPhone LiDAR capture. The plan is the measured floor, 8.95 m by 7.43 m, with the furniture from the LiDAR, a 2 m scale bar, the closed door, and you.
 
