@@ -37,6 +37,38 @@ export function buildGrid(collider, step = 0.25) {
   return { nodes, neighbours, step };
 }
 
+// Places sit in the same grid as the walk, so a click or a search
+// finds the nearest tagged place without scanning the whole room.
+export function indexPlaces(places, step = 1) {
+  const cells = new Map();
+  for (const place of places) {
+    const k = `${Math.floor(place.x / step)},${Math.floor(place.z / step)}`;
+    if (!cells.has(k)) cells.set(k, []);
+    cells.get(k).push(place);
+  }
+  return { cells, step, places };
+}
+
+export function placesNear(index, x, z, radius) {
+  if (!index) return [];
+  const span = Math.ceil(radius / index.step);
+  const cx = Math.floor(x / index.step);
+  const cz = Math.floor(z / index.step);
+  const found = [];
+  for (let i = cx - span; i <= cx + span; i++) {
+    for (let j = cz - span; j <= cz + span; j++) {
+      const bucket = index.cells.get(`${i},${j}`);
+      if (!bucket) continue;
+      for (const place of bucket) {
+        const d = Math.hypot(place.x - x, place.z - z);
+        if (d <= radius) found.push({ place, d });
+      }
+    }
+  }
+  found.sort((a, b) => a.d - b.d);
+  return found;
+}
+
 export function nearestNode(grid, x, z) {
   let best = null;
   let bestD = Infinity;

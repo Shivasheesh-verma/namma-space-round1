@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { SparkRenderer, SplatMesh } from "@sparkjsdev/spark";
 import { LayoutCollider } from "./collision.js";
-import { buildGrid, route } from "./path.js";
+import { buildGrid, indexPlaces, placesNear, route } from "./path.js";
 
 const status = document.querySelector("#status");
 const metrics = document.querySelector("#metrics");
@@ -19,7 +19,8 @@ camera.rotation.order = "YXZ";
 const keys = new Set();
 let yaw = 0, pitch = 0, locked = false, ready = false;
 let collider, spawn, splat, spark, planData = null, places = [], grid = null;
-let path = [], pathName = "", follow = null, pathMarks = null;
+let path = [], pathName = "", follow = null, pathMarks = null, planFrame = null, placeIndex = null;
+let topMap = null, topMeta = null;
 const queryEl = document.querySelector("#q");
 const hitsEl = document.querySelector("#hits");
 const distanceEl = document.querySelector("#distance");
@@ -63,6 +64,7 @@ function drawPlan() {
   const s = Math.min((w - 28) / (maxX - minX + pad * 2), (h - 36) / (maxZ - minZ + pad * 2));
   const X = (x) => 14 + (x - minX + pad) * s;
   const Y = (z) => 10 + (maxZ - z + pad) * s;
+  planFrame = { minX, maxZ, pad, s };
   const ctx = planCtx;
   ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = "#f3f0e8";
@@ -72,9 +74,19 @@ function drawPlan() {
   ctx.closePath();
   ctx.fillStyle = "#c9c8bc";
   ctx.fill();
+  if (topMap && topMeta) {
+    const x0 = X(topMeta.min_x), x1 = X(topMeta.max_x);
+    const y0 = Y(topMeta.max_z), y1 = Y(topMeta.min_z);
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(topMap, x0, y0, x1 - x0, y1 - y0);
+    ctx.restore();
+  }
   if (planData) {
     const cell = planData.cell_m;
     const [ox, oz] = planData.origin_xz;
+    ctx.save();
+    ctx.globalAlpha = 0.45;
     ctx.fillStyle = "#ff4d32";
     for (const o of planData.objects) {
       for (const [i, j] of o.cells) {
@@ -82,6 +94,7 @@ function drawPlan() {
         ctx.fillRect(X(x), Y(z + cell), cell * s, cell * s);
       }
     }
+    ctx.restore();
   }
   ctx.lineWidth = 3;
   ctx.strokeStyle = "#111";
@@ -129,6 +142,8 @@ function drawPlan() {
     ctx.stroke();
   }
   ctx.font = "700 10px 'IBM Plex Mono', monospace";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "bottom";
   for (const place of places) {
     ctx.fillStyle = place.name === pathName ? "#d7ff3f" : "#111";
     ctx.strokeStyle = "#111";
@@ -137,6 +152,8 @@ function drawPlan() {
     ctx.arc(X(place.x), Y(place.z), 4, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
+    ctx.fillStyle = "#111";
+    ctx.fillText(place.name.split(" ")[0], X(place.x) + 6, Y(place.z) - 2);
   }
   if (spawn && distanceEl) {
     const d = Math.hypot(px - spawn.x, pz - spawn.z);
@@ -240,8 +257,26 @@ async function boot() {
   collider.setFurniture(planData);
   if (!collider.canOccupy(spawn.x, spawn.z)) throw new Error("Spawn is inside a desk or a wall");
   try { places = (await get("pois.json")).places; } catch { places = []; }
+  try {
+    topMeta = await get("plan-top.json");
+    topMap = new Image();
+    topMap.src = "mushroom/plan-top.png";
+  } catch { topMeta = null; }
   grid = buildGrid(collider, 0.25);
+  placeIndex = indexPlaces(places, 1);
   wireSearch();
+  renderHits("");
+  planCanvas.addEventListener("click", (event) => {
+    if (!planFrame || !grid || !ready) return;
+    const rect = planCanvas.getBoundingClientRect();
+    const px = (event.clientX - rect.left) * (planCanvas.width / rect.width);
+    const py = (event.clientY - rect.top) * (planCanvas.height / rect.height);
+    const x = (px - 14) / planFrame.s - planFrame.pad + planFrame.minX;
+    const z = planFrame.maxZ + planFrame.pad - (py - 10) / planFrame.s;
+    const near = placesNear(placeIndex, x, z, 0.7);
+    if (near.length) choose(near[0].place);
+    else choose({ name: "That point", words: [], x, z });
+  });
   reset();
   drawPlan();
   spark = new SparkRenderer({ renderer, sortRadial: true });
@@ -308,6 +343,7 @@ function choose(place) {
   }
   follow = { points: found, i: 0 };
   showPath();
+  drawPlan();
   const metres = found.slice(1).reduce((sum, point, i) => sum + Math.hypot(point.x - found[i].x, point.z - found[i].z), 0);
   say(`Path to ${place.name}, ${metres.toFixed(1)} m. It goes around the desks.`);
   if (queryEl) queryEl.value = place.name;
