@@ -8,7 +8,7 @@ Our own capture: one walk with Record3D on an iPhone with LiDAR, 27 October 2026
 | --- | --- |
 | `collision.json` | The rectangle around the floor, the floor height, the eye height, and the body radius. |
 | `plan.json` | In 10 cm cells, everything that is not free floor: walls, furniture, and floor the capture never measured. These cells stop the walk. |
-| `spawn.json` | Where the walk starts: the first position of the phone, and the way it faced. |
+| `spawn.json` | Where the walk starts: the first position of the phone. The view looks down the walk. The phone's own first frame faced a wall 0.6 m away. |
 | `pois.json` | The places the search knows. It is empty. A person names the places. |
 | `scene.ply` | The splat, 836,110 gaussians, about 198 MB. Not in the repository: here it is a link to the trainer's export on this machine. `oct27.html` reads it from this folder. |
 
