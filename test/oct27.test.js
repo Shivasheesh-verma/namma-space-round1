@@ -41,6 +41,18 @@ test("the plan is the cells that are not free floor, and no place is named", () 
   assert.deepEqual(read("pois.json").places, []);
 });
 
+test("the top-down picture uses the same rectangle as the floor", () => {
+  const top = read("plan-top.json");
+  const xs = data.polygon.map((p) => p[0]);
+  const zs = data.polygon.map((p) => p[1]);
+  assert.equal(top.min_x, Math.min(...xs));
+  assert.equal(top.max_x, Math.max(...xs));
+  assert.equal(top.min_z, Math.min(...zs));
+  assert.equal(top.max_z, Math.max(...zs));
+  assert.equal(top.source, "session_oct27");
+  assert.ok(top.covered_fraction > 0.2);
+});
+
 test("the measured floor is one piece", () => {
   const seen = new Array(grid.nodes.length).fill(false);
   let start = 0, best = Infinity;

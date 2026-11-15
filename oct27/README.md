@@ -10,11 +10,11 @@ Our own capture: one walk with Record3D on an iPhone with LiDAR, 27 October 2026
 | `plan.json` | In 10 cm cells, everything that is not free floor: walls, furniture, and floor the capture never measured. These cells stop the walk. |
 | `spawn.json` | Where the walk starts: the first position of the phone, and the way it faced. |
 | `pois.json` | The places the search knows. It is empty. A person names the places. |
-| `scene.ply` | The splat, 999,429 gaussians, about 207 MB. Not in the repository: here it is a link to the trainer's export on this machine. `oct27.html` reads it from this folder. |
+| `scene.ply` | The splat, 836,110 gaussians, about 198 MB. Not in the repository: here it is a link to the trainer's export on this machine. `oct27.html` reads it from this folder. |
 
 `collision.json`, `plan.json` and `spawn.json` are made by `pipeline/free_floor.py` from the LiDAR depth and the phone's own path. A cell is free floor when the LiDAR saw floor there with nothing standing on it, or when the phone was carried within 25 cm of it. Nothing else is walkable, and nothing was drawn by hand.
 
-There is no top-down picture of the scan on this plan. `pipeline/plan_top.py` was run on this splat: a corridor has no desk tops, and the floor alone came out in patches, so the plan shows the measured floor cells only.
+`plan-top.png` is a top-down of the phone's own depth and photos, made by `pipeline/plan_lidar.py`. Colour is kept within 0.4 m of the free or walked floor. An overhead render of the splat is fog, because the gaussians face the walking cameras, and `pipeline/plan_top.py` on this splat found no desk tops and only patches of floor. The plan still draws the measured floor cells, with this picture under them.
 
 ## Credit
 
