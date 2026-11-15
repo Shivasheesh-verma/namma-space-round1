@@ -14,6 +14,11 @@ export function inside(poly, x, z) {
   return yes;
 }
 
+// One number per plan cell. Cells are counted from the plan corner and are never negative.
+function cellKey(i, j) {
+  return i * 100000 + j;
+}
+
 export class LayoutCollider {
   constructor(data) {
     this.data = data;
@@ -27,7 +32,7 @@ export class LayoutCollider {
     const [ox, oz] = plan.origin_xz;
     const keys = new Set();
     for (const object of plan.objects) {
-      for (const [i, j] of object.cells) keys.add(`${i},${j}`);
+      for (const [i, j] of object.cells) keys.add(cellKey(i, j));
     }
     this.furniture = { cell, ox, oz, keys };
   }
@@ -41,7 +46,7 @@ export class LayoutCollider {
     const span = Math.ceil(reach / cell);
     for (let di = -span; di <= span; di++) {
       for (let dj = -span; dj <= span; dj++) {
-        if (!keys.has(`${i + di},${j + dj}`)) continue;
+        if (!keys.has(cellKey(i + di, j + dj))) continue;
         const cx = ox + (i + di + 0.5) * cell;
         const cz = oz + (j + dj + 0.5) * cell;
         const dx = x - cx, dz = z - cz;
@@ -52,6 +57,26 @@ export class LayoutCollider {
   }
   clearance(x, z) {
     return Math.min(...this.data.solid_segments.map(([a, b]) => segmentDistance([x, z], a, b)));
+  }
+  // Metres from the point to the nearest wall or furniture cell, by the same rules that stop
+  // the body: canOccupy is true when this is at least the body radius. Furniture farther than
+  // `cap` is not looked for, so the answer is never more than `cap`.
+  freeDistance(x, z, cap = 1) {
+    let best = Math.min(cap, this.clearance(x, z));
+    if (!this.furniture) return best;
+    const { cell, ox, oz, keys } = this.furniture;
+    const i = Math.round((x - ox) / cell - 0.5);
+    const j = Math.round((z - oz) / cell - 0.5);
+    const span = Math.ceil((best + cell * 0.5) / cell);
+    for (let di = -span; di <= span; di++) {
+      for (let dj = -span; dj <= span; dj++) {
+        if (!keys.has(cellKey(i + di, j + dj))) continue;
+        const cx = ox + (i + di + 0.5) * cell;
+        const cz = oz + (j + dj + 0.5) * cell;
+        best = Math.min(best, Math.hypot(x - cx, z - cz) - cell * 0.5);
+      }
+    }
+    return best;
   }
   canOccupy(x, z) {
     return inside(this.data.polygon, x, z)
