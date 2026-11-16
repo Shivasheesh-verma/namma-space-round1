@@ -1,7 +1,7 @@
 // node --test test/oct27.test.js
 // The 27 October room files: the floor the scan measured is one piece, and the body can walk it end to end.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { LayoutCollider } from "../src/collision.js";
 import { buildGrid, firstBlockedSegment, route, routeLength } from "../src/path.js";
@@ -32,6 +32,26 @@ test("the start stands on free floor at eye height above it", () => {
   assert.equal(collider.canOccupy(spawn.x, spawn.z), true);
   assert.ok(Math.abs(spawn.y - (data.floor_y + data.eye_height)) < 1e-3);
   assert.ok(data.eye_height > 1.2 && data.eye_height < 1.8);
+});
+
+test("the October start looks down the walk, not at the phone's first yaw", () => {
+  assert.ok(Math.abs(spawn.yaw - 0.052) < 1e-6, `yaw is ${spawn.yaw}`);
+});
+
+test("the pages use one built bundle, plan and search wait only for the room files, and the files are never cached", () => {
+  const text = (name) => readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+  const bundles = ["index.html", "oct27.html"].map((page) => text(page).match(/src="(\.\/assets\/index-[\w-]+\.js)"/)?.[1]);
+  assert.ok(bundles[0] && bundles[0] === bundles[1], `bundles: ${bundles}`);
+  assert.ok(existsSync(new URL(`../${bundles[0]}`, import.meta.url)));
+  for (const page of ["index.html", "oct27.html"]) assert.ok(!text(page).includes("src/mushroom.js"), `${page} still imports the source`);
+  assert.ok(text("index.html").includes('href="oct27.html"'), "the classroom page links to the October page");
+  assert.ok(text("oct27.html").includes('href="index.html"'), "the October page links back");
+  const src = text("src/mushroom.js");
+  assert.ok(src.includes('cache: "no-store"'), "room JSON is fetched uncached");
+  const boot = src.slice(src.indexOf("async function boot"));
+  assert.ok(boot.indexOf("roomReady = true") < boot.indexOf("fetch(splatUrl"), "the room is usable before the splat download starts");
+  assert.ok(boot.indexOf("setAnimationLoop(frame)") < boot.indexOf("fetch(splatUrl"), "the plan keeps drawing during the download");
+  assert.ok(!/!ready\) return/.test(src), "plan clicks must not wait for the splat");
 });
 
 test("the plan is the cells that are not free floor, and no place is named", () => {

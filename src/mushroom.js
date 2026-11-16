@@ -17,7 +17,9 @@ const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerH
 camera.rotation.order = "YXZ";
 
 const keys = new Set();
-let yaw = 0, pitch = 0, locked = false, ready = false;
+// roomReady: the room JSON is loaded, so the plan, the search and the walk work.
+// ready: the splat has also been downloaded and drawn.
+let yaw = 0, pitch = 0, locked = false, ready = false, roomReady = false;
 let collider, spawn, splat, spark, planData = null, places = [], grid = null;
 let path = [], pathName = "", follow = null, pathMarks = null, planFrame = null, placeIndex = null;
 let topMap = null, topMeta = null, furnitureEdges = null, planStatic = null;
@@ -42,8 +44,17 @@ const splatUrl = document.body.dataset.splat || "https://zitm8zj1k0rea8km.public
 const readyText = document.body.dataset.ready
   || "Search a place, then follow the path. Desks, walls, and the closed door stop you. WASD walks. Shift is faster. R resets.";
 
+// While the splat downloads, a path may already be chosen and the status line says so. The download
+// notes then go to the small metrics line only, so they do not wipe the path's message.
+function note(text) {
+  if (pathName) metrics.textContent = text;
+  else say(text);
+}
+
+// The room files are small and get edited (spawn.json changed its yaw once and a cached copy kept
+// the old one), so they are never served from the browser cache.
 async function get(name) {
-  const r = await fetch(`${roomDir}/${name}`);
+  const r = await fetch(`${roomDir}/${name}`, { cache: "no-store" });
   if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
   return r.json();
 }
@@ -243,7 +254,7 @@ function drawPlan() {
 
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.05);
-  if (ready) {
+  if (roomReady) {
     let f = 0, s = 0;
     if (keys.has("KeyW")) f += 1;
     if (keys.has("KeyS")) f -= 1;
@@ -345,14 +356,14 @@ async function boot() {
     topMeta = await get("plan-top.json");
     topMap = new Image();
     topMap.onload = () => { planStatic = null; if (collider && spawn) drawPlan(); };
-    topMap.src = `${roomDir}/plan-top.png`;
+    topMap.src = `${roomDir}/plan-top.png?v=${Date.now()}`;   // the picture is edited too: skip a stale copy
   } catch { topMeta = null; }
   grid = buildGrid(collider);
   placeIndex = indexPlaces(places, 1);
   wireSearch();
   renderHits("");
   planCanvas.addEventListener("click", (event) => {
-    if (!planFrame || !grid || !ready) return;
+    if (!planFrame || !grid || !roomReady) return;
     const rect = planCanvas.getBoundingClientRect();
     const px = (event.clientX - rect.left) * (planCanvas.width / rect.width);
     const py = (event.clientY - rect.top) * (planCanvas.height / rect.height);
@@ -363,9 +374,13 @@ async function boot() {
   });
   reset();
   drawPlan();
+  // The room JSON is in: plan clicks, search and the walk work from here, before the splat arrives.
+  // The loop starts now so the plan keeps redrawing (path line, you, distance) during the download.
+  roomReady = true;
+  renderer.setAnimationLoop(frame);
   spark = new SparkRenderer({ renderer, sortRadial: true });
   scene.add(spark);
-  say("Downloading the room…");
+  note("Downloading the room. The plan and search already work.");
   const response = await fetch(splatUrl);
   if (!response.ok) throw new Error(`scene.ply: HTTP ${response.status}`);
   const total = Number(response.headers.get("content-length")) || 0;
@@ -385,14 +400,13 @@ async function boot() {
   const fileBytes = new Uint8Array(got);
   let off = 0;
   for (const chunk of chunks) { fileBytes.set(chunk, off); off += chunk.byteLength; }
-  say("Drawing the room…");
+  note("Drawing the room…");
   splat = new SplatMesh({ fileBytes, fileName: "scene.ply", lod: false, raycastable: false });
   await splat.initialized;
   scene.add(splat);
   ready = true;
-  say(readyText);
+  if (!pathName) say(readyText);
   renderHits("");
-  renderer.setAnimationLoop(frame);
 }
 
 function renderHits(text) {
