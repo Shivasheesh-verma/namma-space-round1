@@ -163,9 +163,27 @@ def main() -> int:
         "objects": [{"id": "not_free_floor", "cells": blocked}]}) + "\n")
     M = np.asarray(rows[0]["pose"]).reshape(4, 4)
     fwd = -M[:3, 2]
+    yaw = float(np.arctan2(-fwd[0], -fwd[2]))
+    # The phone's first frame can face a wall. Keep that yaw only when a metre ahead is still free floor.
+    sx, sz = float(start_cam[0]), float(start_cam[2])
+
+    def clear_ahead(y):
+        dx, dz = -np.sin(y), -np.cos(y)
+        dist = 0.0
+        while dist < 6:
+            dist += a.cell
+            ix = int((sx + dx * dist - lo[0]) / a.cell)
+            iz = int((sz + dz * dist - lo[1]) / a.cell)
+            if not (0 <= ix < keep.shape[0] and 0 <= iz < keep.shape[1]) or not keep[ix, iz]:
+                return dist
+        return dist
+
+    if clear_ahead(yaw) < 1.2:
+        best = max((clear_ahead(np.deg2rad(d)), np.deg2rad(d)) for d in range(0, 360, 5))
+        yaw = best[1]
     (a.out / "spawn.json").write_text(json.dumps({
-        "x": round(float(start_cam[0]), 3), "z": round(float(start_cam[2]), 3), "y": round(a.floor_y + eye, 4),
-        "yaw": round(float(np.arctan2(-fwd[0], -fwd[2])), 3)}) + "\n")
+        "x": round(sx, 3), "z": round(sz, 3), "y": round(a.floor_y + eye, 4),
+        "yaw": round(yaw, 3)}) + "\n")
     # picture for checking: +x right, +z up, as on the viewer's plan
     s = 8
     img = np.full((sub.shape[1] * s, sub.shape[0] * s, 3), 120, np.uint8)

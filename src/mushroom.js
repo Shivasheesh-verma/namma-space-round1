@@ -89,8 +89,9 @@ function outlineCells(plan) {
   return edges;
 }
 
-// Where a point of the room lands on the plan canvas. A room much longer in z than in x is laid on
-// its side so it fills the panel: x runs down the page and z runs to the right.
+// Where a point of the room lands on the plan canvas. A long corridor is laid on its side so it
+// fills the panel. z runs to the right. x runs up the page, not down: the other way is a mirror,
+// and a turn to the right in the walk swung the wrong way on the plan.
 function planView() {
   const poly = collider.data.polygon;
   let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
@@ -103,14 +104,14 @@ function planView() {
   const turned = w > h && spanZ > spanX * 1.5;
   const s = turned ? Math.min((w - 28) / spanZ, (h - 36) / spanX) : Math.min((w - 28) / spanX, (h - 36) / spanZ);
   const point = turned
-    ? (x, z) => [14 + (z - minZ + pad) * s, 10 + (x - minX + pad) * s]
+    ? (x, z) => [14 + (z - minZ + pad) * s, 10 + (maxX - x + pad) * s]
     : (x, z) => [14 + (x - minX + pad) * s, 10 + (maxZ - z + pad) * s];
   const room = turned
-    ? (u, v) => [(v - 10) / s - pad + minX, (u - 14) / s - pad + minZ]
+    ? (u, v) => [maxX + pad - (v - 10) / s, (u - 14) / s - pad + minZ]
     : (u, v) => [(u - 14) / s - pad + minX, maxZ + pad - (v - 10) / s];
   // The same mapping as a canvas matrix, for drawing the top-down picture in room coordinates.
   const matrix = turned
-    ? [0, s, s, 0, 14 + (pad - minZ) * s, 10 + (pad - minX) * s]
+    ? [0, -s, s, 0, 14 + (pad - minZ) * s, 10 + (maxX + pad) * s]
     : [s, 0, 0, -s, 14 + (pad - minX) * s, 10 + (maxZ + pad) * s];
   return { s, point, room, matrix, turned, w, h };
 }
@@ -340,6 +341,8 @@ window.nammaMushroom = {
   walk(dx, dz) { return collider.move(camera.position, dx, dz); },
   go(id) { const place = places.find((item) => item.id === id); if (place) choose(place); return path; },
   goTo(x, z) { choose({ name: "That point", words: [], x, z }); return path; },
+  planOf(x, z) { return planFrame ? planFrame.point(x, z) : null; },
+  roomOf(u, v) { return planFrame ? planFrame.room(u, v) : null; },
 };
 
 async function boot() {
