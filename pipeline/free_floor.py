@@ -72,7 +72,10 @@ def classify(session: Path, rows: list, floor_y: float, cell: float, band: float
     o = (h >= low) & (h <= high)
     np.add.at(floor, (ij[f, 0], ij[f, 1]), 1)
     np.add.at(obstacle, (ij[o, 0], ij[o, 1]), 1)
-    free = (floor >= min_floor) & (obstacle <= max_obstacle)
+    # A handful of standing returns on a cell that is mostly floor is a speck, not a wall.
+    # Six points on 177 of floor were stopping the walk in the middle of the corridor.
+    speck = (floor >= 40) & (obstacle <= np.maximum(max_obstacle, (0.08 * floor).astype(np.int32)))
+    free = ((floor >= min_floor) & (obstacle <= max_obstacle)) | speck
     gx = lo[0] + (np.arange(n[0]) + 0.5) * cell
     gz = lo[1] + (np.arange(n[1]) + 0.5) * cell
     near_path = np.zeros(n, bool)
