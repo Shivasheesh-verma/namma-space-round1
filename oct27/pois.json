@@ -1,4 +1,8 @@
 {
-  "note": "No place is named yet. Places are added by a person: an approach point on free floor, a name, and labeled_by. Until then, click the plan to walk to a point.",
-  "places": []
+  "note": "Three approach points on free floor, taken from the measured walk: the corridor, the opening where it widens, and the far room. Names are not confirmed until labeled_by is a person and checked_frame is set.",
+  "places": [
+    {"id": "corridor", "name": "Corridor", "words": ["corridor", "hall", "hallway", "windows"], "x": -1.40, "z": -7.90, "checked_frame": null, "labeled_by": null, "labeled_on": null},
+    {"id": "opening", "name": "Opening", "words": ["opening", "turn", "end of the corridor"], "x": -0.55, "z": -18.85, "checked_frame": null, "labeled_by": null, "labeled_on": null},
+    {"id": "far", "name": "Far room", "words": ["far", "far room", "room", "end"], "x": -2.10, "z": -26.30, "checked_frame": null, "labeled_by": null, "labeled_on": null}
+  ]
 }

@@ -54,11 +54,22 @@ test("the pages use one built bundle, plan and search wait only for the room fil
   assert.ok(!/!ready\) return/.test(src), "plan clicks must not wait for the splat");
 });
 
-test("the plan is the cells that are not free floor, and no place is named", () => {
+test("the plan is the cells that are not free floor", () => {
   assert.equal(plan.kind, "not_free_floor");
   const cells = plan.room_m[0] * plan.room_m[1] / plan.cell_m ** 2;
   assert.ok(Math.abs(cells - plan.objects[0].cells.length - plan.free_cells) < 1, "blocked and free cells fill the rectangle");
-  assert.deepEqual(read("pois.json").places, []);
+});
+
+test("corridor, opening, and far room are free and reachable", () => {
+  const places = read("pois.json").places;
+  assert.deepEqual(places.map((p) => p.id), ["corridor", "opening", "far"]);
+  for (const place of places) {
+    assert.equal(collider.canOccupy(place.x, place.z), true, place.id);
+    assert.equal(place.labeled_by, null);
+    const points = route(grid, spawn, place);
+    assert.ok(points.length >= 2, place.id);
+    assert.equal(firstBlockedSegment(collider, points), -1, place.id);
+  }
 });
 
 test("the top-down picture uses the same rectangle as the floor", () => {
