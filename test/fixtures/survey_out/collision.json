@@ -1,0 +1,74 @@
+{
+ "source": "survey corners plus lidar cells that still block",
+ "floor_y": 0.0025,
+ "polygon": [
+  [
+   0,
+   0
+  ],
+  [
+   4,
+   0
+  ],
+  [
+   4,
+   6
+  ],
+  [
+   0,
+   6
+  ]
+ ],
+ "radius": 0.18,
+ "eye_height": 1.529,
+ "solid_segments": [
+  [
+   [
+    0,
+    0
+   ],
+   [
+    4,
+    0
+   ]
+  ],
+  [
+   [
+    4,
+    0
+   ],
+   [
+    4,
+    6
+   ]
+  ],
+  [
+   [
+    4,
+    6
+   ],
+   [
+    0,
+    6
+   ]
+  ],
+  [
+   [
+    0,
+    6
+   ],
+   [
+    0,
+    0
+   ]
+  ]
+ ],
+ "steps": [
+  {
+   "x": 1,
+   "y": 0.18,
+   "z": 1,
+   "height_above_floor_m": 0.1775
+  }
+ ]
+}

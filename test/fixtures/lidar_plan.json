@@ -1,0 +1,9 @@
+{
+  "kind": "not_free_floor",
+  "cell_m": 0.1,
+  "origin_xz": [-1, -1],
+  "room_m": [6, 8],
+  "polygon": [[-1, -1], [5, -1], [5, 7], [-1, 7]],
+  "free_cells": 1,
+  "objects": [{"name": "blocked", "cells": [[20, 30]]}]
+}
